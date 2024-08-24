@@ -106,6 +106,7 @@ function App() {
     orderId: "",
     items: [],
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
   const [currentSubcategories, setCurrentSubcategories] = useState<
@@ -217,6 +218,8 @@ function App() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isLoading) return; // Prevent multiple submits
+    setIsLoading(true); // Set loading status to true
 
     const submissionData = {
       orderId: formData.orderId,
@@ -252,6 +255,8 @@ function App() {
     } catch (error) {
       console.error("Error:", error);
       alert("An error occurred while submitting the form.");
+    } finally {
+      setIsLoading(false); // Reset loading status
     }
   };
 
@@ -438,6 +443,7 @@ function App() {
         </div>
         <button
           type="submit"
+          disabled={isLoading}
           className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
         >
           Submit Order
