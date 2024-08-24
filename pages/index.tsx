@@ -179,14 +179,12 @@ function App() {
           Boolean
         ) as MenuItem[];
 
-        console.log("currentItem", currentCategory);
-
         setFormData((prevState) => ({
           ...prevState,
           items: [
             ...prevState.items,
             {
-              item: currentItem,
+              item: selectedItems[0],
               quantity: currentQuantity,
               category: currentCategory.name,
             },
