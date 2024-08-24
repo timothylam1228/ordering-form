@@ -249,6 +249,7 @@ function App() {
         orderId: "",
         items: [],
       });
+
       console.log(data);
     } catch (error) {
       console.error("Error:", error);
@@ -356,14 +357,15 @@ function App() {
               id="category"
               name="category"
               // value={currentCategory.items[] || ""}
-              onChange={(e) =>
-                handleItemChange(
-                  currentCategory.name,
-                  currentCategory.items?.find(
-                    (item) => item.name === e.target.value
-                  ) || null
-                )
-              }
+              onChange={(e) => {
+                const selectedItem = currentCategory?.items?.find(
+                  (item) => item.name === e.target.value
+                );
+
+                if (selectedItem) {
+                  handleItemChange(currentCategory!.name, selectedItem);
+                }
+              }}
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Select an item</option>

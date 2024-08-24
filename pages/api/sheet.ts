@@ -67,10 +67,12 @@ export default async function handler(
 
       res.status(200).json({ message: "Data added successfully" });
     } catch (error) {
-      console.error("Error:", error.message);
-      res
-        .status(500)
-        .json({ error: `Error adding data to sheet: ${error.message}` });
+      if (error instanceof Error) {
+        console.error("Error:", error.message);
+        res
+          .status(500)
+          .json({ error: `Error adding data to sheet: ${error.message}` });
+      }
     }
   } else {
     res.setHeader("Allow", ["POST"]);
