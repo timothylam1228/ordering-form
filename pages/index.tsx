@@ -219,6 +219,7 @@ function App() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isLoading) return; // Prevent multiple submits
+
     setIsLoading(true); // Set loading status to true
 
     const submissionData = {
@@ -227,6 +228,9 @@ function App() {
     };
 
     try {
+      if (formData.items.length === 0) {
+        throw new Error("No items");
+      }
       const response = await fetch("/api/sheet", {
         method: "POST",
         headers: {
@@ -250,8 +254,6 @@ function App() {
         orderId: "",
         items: [],
       });
-
-      console.log(data);
     } catch (error) {
       console.error("Error:", error);
       alert("An error occurred while submitting the form.");
@@ -268,7 +270,16 @@ function App() {
   );
 
   return (
-    <div className="max-w-md mx-auto p-8 bg-white shadow-lg rounded-lg">
+    <div
+      className={`max-w-md mx-auto p-8 bg-white shadow-lg rounded-lg ${
+        isLoading ? "relative" : ""
+      }`}
+    >
+      {isLoading && (
+        <div className="absolute top-0 left-0 w-full h-full bg-gray-500 bg-opacity-50 flex items-center justify-center">
+          <div className="loader"></div>
+        </div>
+      )}
       <h1 className="text-2xl font-bold mb-4 text-center">
         Waffle Shop Order Form
       </h1>
