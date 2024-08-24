@@ -278,7 +278,7 @@ function App() {
             Order ID:
           </label>
           <input
-            type="number"
+            type="tel"
             id="orderId"
             name="orderId"
             inputMode="numeric"
