@@ -23,41 +23,78 @@ export default async function handler(
       ): Promise<void> => {
         for (const item of items) {
           const { name, price } = item.item;
-          const { category } = item;
+          const { category, quantity } = item; // Extract quantity here
           console.log("categories", category);
 
-          try {
-            await sheets.spreadsheets.values.append({
-              spreadsheetId: process.env.SHEET_ID,
-              range: "Summary!A3", // Adjust the range to where you want the data to start
-              valueInputOption: "USER_ENTERED",
-              requestBody: {
-                values: [
-                  [
-                    orderId, // Including the order ID
-                    new Date().toLocaleString("en-CA", {
-                      timeZone: "America/Toronto",
-                      dateStyle: "short",
-                    }), // Current date in Toronto
-                    new Date().toLocaleString("en-CA", {
-                      timeZone: "America/Toronto",
-                      timeStyle: "short",
-                      hour12: false,
-                    }), // Current time in Toronto
-                    item.category, // Category or combined categories
-                    name, // Item name
-                    item.quantity, // Quantity ordered
-                    price, // Price per item
-                    item.quantity * price, // Total price for this item
-                    "Pending", // Status
-                  ],
-                ],
-              },
-            });
-            console.log("Appended item:", name);
-          } catch (err) {
-            console.error("Error appending data to sheet:", err);
-            throw new Error(`Failed to append item ${name}`);
+          for (let i = 0; i < quantity; i++) {
+            // Loop based on quantity
+            try {
+              console.log("name", name);
+
+              if (name.includes("+")) {
+                let splitItems = name.split("+");
+                splitItems = splitItems.map((item: string) => item.trim());
+                for (let index = 0; index < splitItems.length; index++) {
+                  //
+                  await sheets.spreadsheets.values.append({
+                    spreadsheetId: process.env.SHEET_ID,
+                    range: "Summary!A3", // Adjust the range to where you want the data to start
+                    valueInputOption: "USER_ENTERED",
+                    requestBody: {
+                      values: [
+                        [
+                          orderId, // Including the order ID
+                          "Pending", // Status
+                          item.category + -[index + 1], // Category or combined categories
+                          splitItems[index], // Item name
+                          index == 0 ? price : 0, // Price per item
+                          new Date().toLocaleString("en-CA", {
+                            timeZone: "America/Toronto",
+                            dateStyle: "short",
+                          }), // Current date in Toronto
+                          new Date().toLocaleString("en-CA", {
+                            timeZone: "America/Toronto",
+                            timeStyle: "short",
+                            hour12: false,
+                          }), // Current time in Toronto
+                        ],
+                      ],
+                    },
+                  });
+                }
+              } else {
+                await sheets.spreadsheets.values.append({
+                  spreadsheetId: process.env.SHEET_ID,
+                  range: "Summary!A3", // Adjust the range to where you want the data to start
+                  valueInputOption: "USER_ENTERED",
+                  requestBody: {
+                    values: [
+                      [
+                        orderId, // Including the order ID
+                        "Pending", // Status
+
+                        item.category, // Category or combined categories
+                        name, // Item name
+                        price, // Price per item
+                        new Date().toLocaleString("en-CA", {
+                          timeZone: "America/Toronto",
+                          dateStyle: "short",
+                        }), // Current date in Toronto
+                        new Date().toLocaleString("en-CA", {
+                          timeZone: "America/Toronto",
+                          timeStyle: "short",
+                          hour12: false,
+                        }), // Current time in Toronto
+                      ],
+                    ],
+                  },
+                });
+              }
+              console.log("Appended item:", name);
+            } catch (err) {
+              console.error("Error appending data to sheet:", err);
+              throw new Error(`Failed to append item ${name}`);
+            }
           }
         }
       };

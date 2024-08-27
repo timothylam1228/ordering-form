@@ -146,12 +146,10 @@ function App() {
   const handleAddItem = () => {
     if (currentCategory) {
       if (currentCategory.isCombo) {
-        console.log("in");
         // Handle Combo categories with subcategories
         const selectedItems = Object.values(currentSubcategories).filter(
           Boolean
         ) as MenuItem[];
-        console.log("in2", selectedItems);
 
         if (selectedItems.length === Object.keys(currentSubcategories).length) {
           const comboItem: MenuItem = {
