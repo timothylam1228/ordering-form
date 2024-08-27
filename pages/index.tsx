@@ -290,11 +290,13 @@ function App() {
             Order ID:
           </label>
           <input
-            type="tel"
+            type="number"
             id="orderId"
             name="orderId"
             inputMode="numeric"
             pattern="[0-9]*"
+            max={48}
+            min={1}
             value={formData.orderId}
             onChange={handleOrderIdChange}
             required
