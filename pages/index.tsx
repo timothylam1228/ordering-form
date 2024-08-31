@@ -45,7 +45,8 @@ const menuItems: Category[] = [
       {
         name: "Drink Options",
         items: [
-          { name: "Milk Tea", price: 0 },
+          { name: "Hot Milktea", price: 0 },
+          { name: "Cold Milk Tea", price: 0 },
           { name: "Lemonade", price: 0 },
           { name: "No Drink", price: 0 },
         ],
@@ -87,14 +88,16 @@ const menuItems: Category[] = [
         name: "First Drink",
         items: [
           { name: "Lemonade", price: 10 },
-          { name: "Milktea", price: 10 },
+          { name: "Hot Milktea", price: 10 },
+          { name: "Cold Milktea", price: 10 },
         ],
       },
       {
         name: "Second Drink",
         items: [
           { name: "Lemonade", price: 0 },
-          { name: "Milktea", price: 0 },
+          { name: "Hot Milktea", price: 0 },
+          { name: "cold Milktea", price: 0 },
         ],
       },
     ],
