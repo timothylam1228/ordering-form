@@ -56,22 +56,19 @@ const menuItems: Category[] = [
   {
     name: "Savoury Waffles",
     isCombo: false,
-
     items: [
       { name: "Ebi", price: 10 },
-      { name: "Pork", price: 10 },
+      { name: "Pork Floss Seaweed", price: 10 },
       { name: "Hand Pulled Pork", price: 10 },
     ],
   },
   {
     name: "Sweet Waffles",
     isCombo: false,
-
     items: [
-      { name: "Classic", price: 10 },
-      { name: "Sesame", price: 10 },
-      { name: "Matcha", price: 10 },
-      { name: "Chocolate", price: 10 },
+      { name: "Creme Burlee", price: 10 },
+      { name: "Matcha Red Bean", price: 10 },
+      { name: "Chocolate Nutella", price: 10 },
     ],
   },
   {
