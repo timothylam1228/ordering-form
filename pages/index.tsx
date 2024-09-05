@@ -30,7 +30,7 @@ interface Category {
 
 const menuItems: Category[] = [
   {
-    name: "Classic Combo - 1 Waffle + 1 Drink",
+    name: "Classic Combo (1 Waffle & 1 Drink)",
     isCombo: true,
     subcategories: [
       {
@@ -63,7 +63,7 @@ const menuItems: Category[] = [
     ],
   },
   {
-    name: "Sweet Combo - 1 Waffle + Ice Cream",
+    name: "Sweet Combo (1 Waffle & Ice Cream)",
     isCombo: false,
     items: [
       { name: "Creme Burlee", price: 10 },
