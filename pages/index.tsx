@@ -30,7 +30,7 @@ interface Category {
 
 const menuItems: Category[] = [
   {
-    name: "Combo A",
+    name: "Classic Combo - 1 Waffle + 1 Drink",
     isCombo: true,
     subcategories: [
       {
@@ -38,15 +38,15 @@ const menuItems: Category[] = [
         items: [
           { name: "Classic Waffle (Chocolate)", price: 10 },
           { name: "Classic Waffle (Matcha)", price: 10 },
-          { name: "Classic Waffle (Classic)", price: 10 },
+          { name: "Classic Waffle (Original)", price: 10 },
           { name: "Classic Waffle (Sesame)", price: 10 },
         ],
       },
       {
         name: "Drink Options",
         items: [
-          { name: "Hot Milktea", price: 0 },
-          { name: "Cold Milk Tea", price: 0 },
+          { name: "Hot Milk tea", price: 0 },
+          { name: "Iced Milk Tea", price: 0 },
           { name: "Lemonade", price: 0 },
           { name: "No Drink", price: 0 },
         ],
@@ -54,47 +54,46 @@ const menuItems: Category[] = [
     ],
   },
   {
-    name: "Savoury Waffles",
+    name: "Savoury Combo",
     isCombo: false,
     items: [
-      { name: "Ebi", price: 10 },
-      { name: "Pork Floss Seaweed", price: 10 },
-      { name: "Hand Pulled Pork", price: 10 },
+      { name: "Crispy Ebi", price: 10 },
+      { name: "Seaweed Pork Floss", price: 10 },
+      { name: "Pulled Pork", price: 10 },
     ],
   },
   {
-    name: "Sweet Waffles",
+    name: "Sweet Combo - 1 Waffle + Ice Cream",
     isCombo: false,
     items: [
       { name: "Creme Burlee", price: 10 },
       { name: "Matcha Red Bean", price: 10 },
-      { name: "Chocolate Nutella", price: 10 },
+      { name: "Chocolate Nutella Crunch", price: 10 },
     ],
   },
   {
     name: "Milkshakes",
     isCombo: false,
-    items: [{ name: "Milkshake", price: 10 }],
+    items: [{ name: "Oreo Milkshake", price: 10 }],
   },
   {
     name: "Drink Combo",
     isCombo: true,
-
     subcategories: [
       {
         name: "First Drink",
         items: [
           { name: "Lemonade", price: 10 },
-          { name: "Hot Milktea", price: 10 },
-          { name: "Cold Milktea", price: 10 },
+          { name: "Hot Milk tea", price: 10 },
+          { name: "Iced Milktea", price: 10 },
         ],
       },
       {
         name: "Second Drink",
         items: [
           { name: "Lemonade", price: 0 },
-          { name: "Hot Milktea", price: 0 },
-          { name: "cold Milktea", price: 0 },
+          { name: "Hot Milk tea", price: 0 },
+          { name: "cold Milk tea", price: 0 },
         ],
       },
     ],
