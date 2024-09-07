@@ -19,7 +19,8 @@ export default async function handler(
       const sheets = google.sheets({ version: "v4", auth });
       const appendOrderItems = async (
         items: any[],
-        orderId: string
+        orderId: string,
+        isVourch: boolean
       ): Promise<void> => {
         for (const item of items) {
           const { name, price } = item.item;
@@ -29,7 +30,7 @@ export default async function handler(
           for (let i = 0; i < quantity; i++) {
             // Loop based on quantity
             try {
-              console.log("name", name);
+              console.log("name", items);
 
               if (name.includes("+")) {
                 let splitItems = name.split("+");
@@ -57,6 +58,7 @@ export default async function handler(
                             timeStyle: "short",
                             hour12: false,
                           }), // Current time in Toronto
+                          isVourch,
                         ],
                       ],
                     },
@@ -85,6 +87,7 @@ export default async function handler(
                           timeStyle: "short",
                           hour12: false,
                         }), // Current time in Toronto
+                        isVourch,
                       ],
                     ],
                   },
@@ -100,7 +103,11 @@ export default async function handler(
       };
 
       // Await the function and handle errors if they arise
-      await appendOrderItems(req.body.items, req.body.orderId);
+      await appendOrderItems(
+        req.body.items,
+        req.body.orderId,
+        req.body.isVourch
+      );
 
       res.status(200).json({ message: "Data added successfully" });
     } catch (error) {

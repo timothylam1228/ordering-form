@@ -8,6 +8,7 @@ interface OrderItem {
 
 interface FormData {
   orderId: string;
+  isVourch: boolean;
   items: OrderItem[];
 }
 
@@ -103,6 +104,7 @@ const menuItems: Category[] = [
 function App() {
   const [formData, setFormData] = useState<FormData>({
     orderId: "",
+    isVourch: false,
     items: [],
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -222,8 +224,10 @@ function App() {
     const submissionData = {
       orderId: formData.orderId,
       items: formData.items,
+      isVourch: formData.isVourch,
     };
 
+    console.log("formData.items", submissionData);
     try {
       if (formData.items.length === 0) {
         throw new Error("No items");
@@ -250,6 +254,7 @@ function App() {
       setFormData({
         orderId: "",
         items: [],
+        isVourch: false,
       });
     } catch (error) {
       console.error("Error:", error);
@@ -450,6 +455,21 @@ function App() {
           <h2 className="text-lg font-bold">
             Total Price: ${totalPrice.toFixed(2)}
           </h2>
+        </div>
+        <div className="flex flex-row items-center mb-4">
+          <label className="flex pr-4">Is Vourch?</label>
+          <input
+            type="checkbox"
+            id="isVourch"
+            name="isVourch"
+            checked={formData.isVourch}
+            onChange={(e) =>
+              setFormData((prevState) => ({
+                ...prevState,
+                isVourch: e.target.checked,
+              }))
+            }
+          />
         </div>
         <button
           type="submit"
