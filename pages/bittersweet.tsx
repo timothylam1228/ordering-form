@@ -22,7 +22,6 @@ interface Category {
 const menuItems: Category = {
   items: [
     { name: "Original Waffle", price: 8, withDrink: false },
-    { name: "Creme Brulee", price: 12, withDrink: false },
     { name: "Nutella Crunch", price: 10, withDrink: false },
     { name: "Matcha Waffle", price: 8, withDrink: false },
     { name: "Pistachio Waffle", price: 8, withDrink: false },
@@ -47,6 +46,7 @@ function App() {
   };
 
   const handleProductChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log("change product");
     if (e.target.value) {
       const foundItem = menuItems.items?.find(
         (item) => item.name === e.target.value
@@ -54,6 +54,7 @@ function App() {
       if (foundItem) {
         setSelectedItem(foundItem);
       } else {
+        console.log("");
         setSelectedItem(null);
       }
     }
@@ -81,6 +82,8 @@ function App() {
         ],
       }));
       setSelectedItem(null);
+    } else {
+      setSelectedItem(null);
     }
   };
 
@@ -91,10 +94,50 @@ function App() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle form submission logic here
     console.log("Form submitted:", formData);
+    if (isLoading) return; // Prevent multiple submits
+
+    setIsLoading(true); // Set loading status to true
+
+    const submissionData = {
+      orderId: formData.orderId,
+      items: formData.items,
+    };
+
+    try {
+      if (formData.items.length === 0) {
+        throw new Error("No items");
+      }
+      const response = await fetch("/api/sheetv2", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(submissionData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      alert("Form submitted successfully!");
+      // Reset form
+
+      setSelectedItem(null);
+      setFormData({
+        orderId: "",
+        items: [],
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while submitting the form.");
+    } finally {
+      setIsLoading(false); // Reset loading status
+    }
   };
 
   return (
@@ -143,7 +186,7 @@ function App() {
           <select
             id="product"
             name="product"
-            value={selectedItem?.name}
+            value={selectedItem?.name || ""}
             onChange={handleProductChange}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           >
