@@ -23,6 +23,7 @@ const menuItems: Category = {
   items: [
     { name: "Original Waffle", price: 8, withDrink: false },
     { name: "Nutella Crunch", price: 10, withDrink: false },
+    { name: "Original Chocolate", price: 10, withDrink: false },
     { name: "Matcha Waffle", price: 8, withDrink: false },
     { name: "Pistachio Waffle", price: 12, withDrink: false },
     { name: "Hot Milk Tea", price: 4 },
