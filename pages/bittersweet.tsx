@@ -26,9 +26,9 @@ const menuItems: Category = {
     { name: "Original Chocolate", price: 10, withDrink: false },
     { name: "Matcha Waffle", price: 8, withDrink: false },
     { name: "Pistachio Waffle", price: 12, withDrink: false },
-    { name: "Hot Milk Tea", price: 4 },
   ],
 };
+
 
 function App() {
   const [formData, setFormData] = useState<FormData>({

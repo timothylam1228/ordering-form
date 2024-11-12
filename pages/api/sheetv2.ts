@@ -30,7 +30,7 @@ export default async function handler(
             //
             await sheets.spreadsheets.values.append({
               spreadsheetId: process.env.SHEET_ID,
-              range: "Summary!A3", // Adjust the range to where you want the data to start
+              range: "BlowChick!A3", // Adjust the range to where you want the data to start
               valueInputOption: "USER_ENTERED",
               requestBody: {
                 values: [
