@@ -21,11 +21,10 @@ const menuItems: MenuItems[] = [
     name: "Waffle",
     half: true,
     flavor: [
-      { name: "Original", price: 9 },
-      { name: "Earl Grey", price: 11 },
-      { name: "Chocolate", price: 13 },
-      { name: "Pistacho", price: 13 },
-      { name: "Ovaltine", price: 13 },
+      { name: "Original", price: 10 },
+      { name: "Earl Grey", price: 12 },
+      { name: "Chocolate", price: 12 },
+      { name: "Pistacho", price: 14 },
     ],
   },
   {
@@ -35,7 +34,6 @@ const menuItems: MenuItems[] = [
       { name: "Original", price: 6 },
       { name: "Chocolate", price: 8 },
       { name: "Pistacho", price: 8 },
-      { name: "Ovaltine", price: 8 },
     ],
   },
 ];
@@ -47,6 +45,9 @@ const OrderForm = () => {
   const [isHalf, setIsHalf] = useState(false);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [followedInstagram, setFollowedInstagram] = useState(false);
+  const [repostedStory, setRepostedStory] = useState(false);
+
   const [error, setError] = useState("");
 
   const selectedMenuItem = menuItems.find(
@@ -82,7 +83,18 @@ const OrderForm = () => {
     setOrderItems(orderItems.filter((_, i) => i !== index));
   };
 
-  const totalPrice = orderItems.reduce((sum, item) => sum + item.price, 0);
+  const calculateSocialDiscounts = () => {
+    let discount = 0;
+    if (followedInstagram) discount += 1;
+    if (repostedStory) discount += 1;
+    return discount;
+  };
+
+  // const totalPrice = orderItems.reduce((sum, item) => sum + item.price, 0);
+
+  const subtotalPrice = orderItems.reduce((sum, item) => sum + item.price, 0);
+  const socialDiscounts = calculateSocialDiscounts();
+  const totalPrice = Math.max(subtotalPrice - socialDiscounts, 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,7 +108,14 @@ const OrderForm = () => {
       const response = await fetch("/api/sheetv3", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId, items: orderItems }),
+        body: JSON.stringify({
+          orderId,
+          items: orderItems,
+          socialDiscounts: {
+            followedInstagram: followedInstagram,
+            repostedStory: repostedStory,
+          },
+        }),
       });
 
       if (!response.ok) throw new Error("Failed to submit order");
@@ -118,7 +137,7 @@ const OrderForm = () => {
 
   const calculatePrice = (basePrice: number, isHalf: boolean) => {
     if (isHalf) {
-      return (basePrice + 1) / 2; // Update price calculation for half portions
+      return basePrice / 2 + 1; // Update price calculation for half portions
     }
     return basePrice;
   };
@@ -207,6 +226,30 @@ const OrderForm = () => {
             </>
           )}
 
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="follow"
+              checked={followedInstagram}
+              onChange={(e) => setFollowedInstagram(e.target.checked)}
+              className="rounded border-gray-300"
+            />
+            <label htmlFor="follow" className="text-sm">
+              Follow us on Instagram (-$1)
+            </label>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="repost"
+              checked={repostedStory}
+              onChange={(e) => setRepostedStory(e.target.checked)}
+              className="rounded border-gray-300"
+            />
+            <label htmlFor="repost" className="text-sm">
+              Repost our story (-$1)
+            </label>
+          </div>
           <button
             type="button"
             onClick={handleAddItem}
