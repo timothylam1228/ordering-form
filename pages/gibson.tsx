@@ -149,7 +149,7 @@ const OrderForm = () => {
   return (
     <div className="max-w-md mx-auto p-6 bg-white">
       <div>
-        <div className="text-2xl text-center">EPick Order Form</div>
+        <div className="text-2xl text-center">Gibson Order Form</div>
       </div>
       <div>
         {isLoading && (
