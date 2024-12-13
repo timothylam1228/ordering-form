@@ -102,6 +102,7 @@ const OrderForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (orderItems.length === 0) {
       setError("Please add at least one item to your order");
       return;
@@ -124,6 +125,9 @@ const OrderForm = () => {
 
       if (!response.ok) throw new Error("Failed to submit order");
 
+      // Parse the JSON response
+      const data = await response.json();
+
       // Reset form
       setOrderId("");
       setOrderItems([]);
@@ -131,14 +135,18 @@ const OrderForm = () => {
       setSelectedFlavor("");
       setIsHalf(false);
       setError("");
-      alert("Order submitted successfully!");
+
+      // Alert with waiting time
+      alert(
+        `Order submitted successfully!!! Your order will be ready in ${data.waitingTime}.`
+      );
     } catch (err) {
       setError("Failed to submit order. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
-
+  
   const calculatePrice = (basePrice: number, isHalf: boolean) => {
     if (isHalf) {
       return basePrice / 2 + 1; // Update price calculation for half portions
