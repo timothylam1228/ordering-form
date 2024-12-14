@@ -110,7 +110,7 @@ const OrderForm = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/illu", {
+      const response = await fetch("/api/bitter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
