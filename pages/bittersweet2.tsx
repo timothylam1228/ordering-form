@@ -51,6 +51,10 @@ const OrderForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [followedInstagram, setFollowedInstagram] = useState(false);
   const [repostedStory, setRepostedStory] = useState(false);
+  const [lastOrder, setLastOrder] = useState<{
+    orderId: string;
+    items: any[];
+  } | null>(null);
 
   const [error, setError] = useState("");
 
@@ -101,12 +105,15 @@ const OrderForm = () => {
   const totalPrice = Math.max(subtotalPrice - socialDiscounts, 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    setLastOrder(null);
     e.preventDefault();
 
     if (orderItems.length === 0) {
       setError("Please add at least one item to your order");
       return;
     }
+
+    saveOrder();
 
     setIsLoading(true);
     try {
@@ -154,10 +161,21 @@ const OrderForm = () => {
     return basePrice;
   };
 
+  const saveOrder = () => {
+    const lastOrderState: { orderId: string; items: any[] } = {
+      orderId,
+      items: orderItems,
+    };
+    // You can add code here to save the lastOrderState, e.g., to local storage or a database
+    setLastOrder(lastOrderState);
+  };
+
   return (
     <div className="max-w-sm mx-auto p-4 bg-white shadow-md rounded-md">
       <div>
-        <div className="text-2xl font-bold text-center">BitterSweet Christmas Order Form</div>
+        <div className="text-2xl font-bold text-center">
+          BitterSweet Christmas Order Form
+        </div>
       </div>
       <div className="relative">
         {isLoading && (
@@ -319,6 +337,27 @@ const OrderForm = () => {
             {isLoading ? "Submitting..." : "Submit Order"}
           </button>
         </form>
+      </div>
+      {/* Last Order */}
+      <div className="border-t pt-4">
+        <h3 className="font-medium text-lg mb-2">Last Order</h3>
+        {lastOrder ? (
+          <ul className="space-y-2">
+            <li className="flex justify-between items-center">
+              <span>
+                {lastOrder.orderId}
+                {lastOrder.items.map((item, index) => (
+                  <span key={index} className="flex flex-col">
+                    {item.product} - {item.flavor}
+                    {item.isHalf && " (Half)"}
+                  </span>
+                ))}
+              </span>
+            </li>
+          </ul>
+        ) : (
+          <p className="text-gray-500">No last order</p>
+        )}
       </div>
     </div>
   );
