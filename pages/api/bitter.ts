@@ -17,6 +17,9 @@ interface OrderRequest {
   items: OrderItem[];
 }
 
+const MACHINE_COUNT = 2;
+const PROCESSING_TIME = 5; // in minutes
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -40,6 +43,23 @@ export default async function handler(
 
     const sheets = google.sheets({ version: "v4", auth });
 
+    const calculateWaitingTime = async (): Promise<number> => {
+      const sheetData = await sheets.spreadsheets.values.get({
+        spreadsheetId: process.env.SHEET_ID,
+        range: "bittersweetv2!A2:H", // Adjust range to match your data
+      });
+
+      const rows = sheetData.data.values || [];
+      const handlingOrders = rows.filter((row) => row[1] === "Handling").length;
+      const pendingOrders = rows.filter((row) => row[1] === "Pending").length;
+
+      const currentLoad = handlingOrders + pendingOrders;
+      const totalProcessingTime =
+        Math.ceil(currentLoad / MACHINE_COUNT) * PROCESSING_TIME;
+
+      return totalProcessingTime;
+    };
+
     const appendOrderItems = async (
       items: OrderItem[],
       orderId: string,
@@ -55,7 +75,7 @@ export default async function handler(
 
       // Calculate subtotal
       const subtotal = items.reduce((sum, item) => sum + item.price, 0);
-      
+
       // Calculate final total
       const finalTotal = Math.max(subtotal - totalDiscount, 0);
 
@@ -99,7 +119,6 @@ export default async function handler(
                   currentTime,
                   socialDiscounts.followedInstagram,
                   socialDiscounts.repostedStory,
-                  
                 ],
               ],
             },
@@ -115,8 +134,13 @@ export default async function handler(
       }
     };
 
+    const waitingTime = await calculateWaitingTime();
+
     await appendOrderItems(items, orderId, socialDiscounts);
-    res.status(200).json({ message: "Order processed successfully" });
+    res.status(200).json({
+      message: "Order processed successfully",
+      waitingTime: `${waitingTime} minutes`,
+    });
   } catch (error) {
     console.error("Error processing order:", error);
     res.status(500).json({

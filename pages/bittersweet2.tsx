@@ -102,6 +102,7 @@ const OrderForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (orderItems.length === 0) {
       setError("Please add at least one item to your order");
       return;
@@ -109,7 +110,7 @@ const OrderForm = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/bitter", {
+      const response = await fetch("/api/illu", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -124,6 +125,9 @@ const OrderForm = () => {
 
       if (!response.ok) throw new Error("Failed to submit order");
 
+      // Parse the JSON response
+      const data = await response.json();
+
       // Reset form
       setOrderId("");
       setOrderItems([]);
@@ -131,7 +135,11 @@ const OrderForm = () => {
       setSelectedFlavor("");
       setIsHalf(false);
       setError("");
-      alert("Order submitted successfully!");
+
+      // Alert with waiting time
+      alert(
+        `Order submitted successfully!!! Your order will be ready in ${data.waitingTime}.`
+      );
     } catch (err) {
       setError("Failed to submit order. Please try again.");
     } finally {
@@ -149,7 +157,7 @@ const OrderForm = () => {
   return (
     <div className="max-w-sm mx-auto p-4 bg-white shadow-md rounded-md">
       <div>
-        <div className="text-2xl font-bold text-center">Illu Order Form</div>
+        <div className="text-2xl font-bold text-center">BitterSweet Christmas Order Form</div>
       </div>
       <div className="relative">
         {isLoading && (
