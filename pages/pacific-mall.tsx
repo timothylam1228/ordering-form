@@ -3,7 +3,8 @@ import React, { useState } from "react";
 interface MenuItems {
   name: string;
   half: boolean;
-  flavor: {
+  price?: number;
+  flavor?: {
     name: string;
     price: number;
   }[];
@@ -34,43 +35,29 @@ const menuItems: MenuItems[] = [
     name: "Waffle",
     half: true,
     flavor: [
-      { name: "Original", price: 10 },
-      { name: "Nutella Crunch", price: 12 },
-      { name: "Earl Grey", price: 12 },
+      { name: "Original", price: 14 },
+      { name: "Nutella Crunch", price: 14 },
+      { name: "Earl Grey", price: 14 },
       { name: "Matcha", price: 14 },
-      { name: "Black Sesame", price: 14 },
-      { name: "Pistachio", price: 14 },
-      { name: "Ovaltine", price: 14 },
-      { name: "Crème Brûlée", price: 14 },
+      { name: "Black Sesame", price: 16 },
+      { name: "Pistachio", price: 16 },
+      { name: "Crème Brûlée", price: 16 },
     ],
   },
   {
     name: "Croffle",
     half: false,
     flavor: [
-      { name: "Original", price: 6 },
-      { name: "Crunch", price: 7 },
-      { name: "Pistachio", price: 8 },
-      { name: "Ovaltine", price: 8 },
-      { name: "Crème Brûlée", price: 8 },
+      { name: "Original", price: 8 },
+      { name: "Chocolate", price: 8 },
+      { name: "Pistachio", price: 9 },
+      { name: "Crème Brûlée", price: 9 },
     ],
   },
   {
-    name: "Cream Puff (泡芙)",
+    name: "KeyChain",
     half: false,
-    isQuantityBased: true,
-    flavor: [
-      { name: "Original", price: 0 },
-      { name: "Pistachio", price: 0 },
-      { name: "Chocolate", price: 0 },
-      { name: "Black Sesame", price: 0 },
-      { name: "Matcha", price: 0 },
-    ],
-    quantities: [
-      { quantity: 3, price: 10 },
-      { quantity: 5, price: 14 },
-      { quantity: -1, price: -1 }, // Special case for custom quantity
-    ],
+    price: 8,
   },
 ];
 
@@ -102,7 +89,8 @@ const OrderForm = () => {
     setSelectedFlavors((prev) => {
       const currentFlavor = prev.find((f) => f.name === flavorName);
       const totalCurrentCount = prev.reduce((sum, f) => sum + f.count, 0);
-      const targetQuantity = selectedQuantity === -1 ? customQuantity : selectedQuantity;
+      const targetQuantity =
+        selectedQuantity === -1 ? customQuantity : selectedQuantity;
 
       if (!targetQuantity || totalCurrentCount + change > targetQuantity) {
         return prev;
@@ -127,7 +115,26 @@ const OrderForm = () => {
   };
 
   const hasWaffleOrCroffle = () => {
-    return orderItems.some(item => item.product === "Waffle" || item.product === "Croffle");
+    return orderItems.some(
+      (item) => item.product === "Waffle" || item.product === "Croffle"
+    );
+  };
+
+  const updateKeyChainPrices = (items: OrderItem[]) => {
+    const hasWaffleOrCroffleBool = items.some(
+      (item) => item.product === "Waffle" || item.product === "Croffle"
+    );
+    
+    return items.map(item => {
+      if (item.product === "KeyChain") {
+        return {
+          ...item,
+          price: hasWaffleOrCroffleBool ? 5 : 8,
+          isPromotionalPuff: hasWaffleOrCroffleBool
+        };
+      }
+      return item;
+    });
   };
 
   const handleAddItem = () => {
@@ -144,30 +151,17 @@ const OrderForm = () => {
     let price = 0;
     let isPromotionalPuff = false;
 
-    if (selectedMenuItem.name === "Cream Puff (泡芙)" && hasWaffleOrCroffle()) {
-      // Apply $2 price for each puff when there's a waffle/croffle in order
-      price = selectedQuantity === -1 ? customQuantity * 2 : (selectedQuantity || 0) * 2;
+    if (selectedMenuItem.name === "KeyChain" && hasWaffleOrCroffle()) {
+      // 5$ key chain when there's a waffle/croffle in order
+      price = 5;
       isPromotionalPuff = true;
+    } else if (selectedMenuItem.flavor && selectedFlavor) {
+      // For items with flavors, get price from the selected flavor
+      const flavorPrice = selectedMenuItem.flavor.find(f => f.name === selectedFlavor)?.price || 0;
+      price = calculatePrice(flavorPrice, isHalf);
     } else {
-      if (selectedMenuItem.isQuantityBased && selectedQuantity) {
-        if (selectedQuantity === -1) {
-          // Custom quantity pricing at $2 each
-          price = Math.abs(customQuantity * 2);
-        } else {
-          const quantityPrice = selectedMenuItem.quantities?.find(
-            (q) => q.quantity === selectedQuantity
-          );
-          if (quantityPrice) {
-            price = quantityPrice.price;
-          }
-        }
-      } else {
-        const flavorItem = selectedMenuItem.flavor.find(
-          (f) => f.name === selectedFlavor
-        );
-        if (!flavorItem) return;
-        price = calculatePrice(flavorItem.price, isHalf);
-      }
+      // For items without flavors (like KeyChain)
+      price = selectedMenuItem.price || 0;
     }
 
     if (selectedMenuItem.isQuantityBased) {
@@ -183,7 +177,10 @@ const OrderForm = () => {
         setError("Please select at least one flavor");
         return;
       }
-      if (selectedQuantity !== -1 && getTotalFlavorCount() !== selectedQuantity) {
+      if (
+        selectedQuantity !== -1 &&
+        getTotalFlavorCount() !== selectedQuantity
+      ) {
         setError(`Please select exactly ${selectedQuantity} pieces`);
         return;
       }
@@ -191,22 +188,28 @@ const OrderForm = () => {
         setError(`Please select exactly ${customQuantity} pieces`);
         return;
       }
-    } else if (!selectedFlavor) {
+    } else if (!selectedFlavor && selectedMenuItem.flavor) {
       setError("Please select a flavor");
       return;
     }
 
     const newItem: OrderItem = {
       product: selectedProduct,
-      flavor: selectedMenuItem.isQuantityBased ? "Mixed" : selectedFlavor,
+      flavor: selectedMenuItem.isQuantityBased ? "Mixed" : (selectedFlavor || "No Flavor"),
       isHalf,
       price,
-      quantity: selectedMenuItem.isQuantityBased && (selectedQuantity === -1 ? customQuantity : selectedQuantity) || undefined,
-      selectedFlavors: selectedMenuItem.isQuantityBased ? selectedFlavors : undefined,
-      isPromotionalPuff
+      quantity:
+        (selectedMenuItem.isQuantityBased &&
+          (selectedQuantity === -1 ? customQuantity : selectedQuantity)) ||
+        undefined,
+      selectedFlavors: selectedMenuItem.isQuantityBased
+        ? selectedFlavors
+        : undefined,
+      isPromotionalPuff,
     };
 
-    setOrderItems([...orderItems, newItem]);
+    const updatedItems = updateKeyChainPrices([...orderItems, newItem]);
+    setOrderItems(updatedItems);
     setError("");
     // Reset selections
     setSelectedFlavor("");
@@ -217,7 +220,9 @@ const OrderForm = () => {
   };
 
   const handleRemoveItem = (index: number) => {
-    setOrderItems(orderItems.filter((_, i) => i !== index));
+    const filteredItems = orderItems.filter((_, i) => i !== index);
+    const updatedItems = updateKeyChainPrices(filteredItems);
+    setOrderItems(updatedItems);
   };
 
   const calculateSocialDiscounts = () => {
@@ -319,7 +324,7 @@ const OrderForm = () => {
       return !selectedQuantity || getTotalFlavorCount() !== selectedQuantity;
     }
 
-    return !selectedFlavor;
+    return !selectedFlavor && selectedMenuItem.flavor;
   };
 
   return (
@@ -392,7 +397,7 @@ const OrderForm = () => {
                     className="w-full p-3 border border-gray-200 rounded-md text-base focus:ring-gray-500 focus:border-gray-500"
                   >
                     <option value="">Select a flavor</option>
-                    {selectedMenuItem?.flavor.map((flavor) => (
+                    {selectedMenuItem?.flavor?.map((flavor) => (
                       <option key={flavor.name} value={flavor.name}>
                         {flavor.name}
                         {!selectedMenuItem.isQuantityBased &&
@@ -425,8 +430,8 @@ const OrderForm = () => {
                       <option value="">Select quantity</option>
                       {selectedMenuItem.quantities?.map((q) => (
                         <option key={q.quantity} value={q.quantity}>
-                          {q.quantity === -1 
-                            ? "Other (Custom Quantity - $2 each)" 
+                          {q.quantity === -1
+                            ? "Other (Custom Quantity - $2 each)"
                             : `${q.quantity} pieces - $${q.price}`}
                         </option>
                       ))}
@@ -453,55 +458,65 @@ const OrderForm = () => {
                     </div>
                   )}
 
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium mb-1 text-gray-800">
-                      Select Flavors (Selected: {getTotalFlavorCount()}/
-                      {selectedQuantity === -1 ? customQuantity : selectedQuantity || "..."})
-                    </label>
-                    <div className="space-y-2 p-3 border border-gray-200 rounded-md">
-                      {selectedMenuItem?.flavor.map((flavor) => {
-                        const flavorCount =
-                          selectedFlavors.find((f) => f.name === flavor.name)
-                            ?.count || 0;
-                        return (
-                          <div
-                            key={flavor.name}
-                            className="flex items-center justify-between p-2 border-b border-gray-100"
-                          >
-                            <span className="text-sm">{flavor.name}</span>
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleFlavorChange(flavor.name, -1)
-                                }
-                                disabled={flavorCount === 0}
-                                className="w-8 h-8 rounded-full bg-gray-100 text-gray-800 flex items-center justify-center disabled:opacity-50"
-                              >
-                                -
-                              </button>
-                              <span className="w-8 text-center">
-                                {flavorCount}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleFlavorChange(flavor.name, 1)
-                                }
-                                disabled={
-                                  (!selectedQuantity && selectedQuantity !== -1) ||
-                                  getTotalFlavorCount() >= (selectedQuantity === -1 ? customQuantity : selectedQuantity)
-                                }
-                                className="w-8 h-8 rounded-full bg-gray-100 text-gray-800 flex items-center justify-center disabled:opacity-50"
-                              >
-                                +
-                              </button>
+
+                  {selectedMenuItem?.flavor && (
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium mb-1 text-gray-800">
+                        Select Flavors (Selected: {getTotalFlavorCount()}/
+                        {selectedQuantity === -1
+                          ? customQuantity
+                          : selectedQuantity || "..."}
+                        )
+                      </label>
+                      <div className="space-y-2 p-3 border border-gray-200 rounded-md">
+                        {selectedMenuItem?.flavor?.map((flavor) => {
+                          const flavorCount =
+                            selectedFlavors.find((f) => f.name === flavor.name)
+                              ?.count || 0;
+                          return (
+                            <div
+                              key={flavor.name}
+                              className="flex items-center justify-between p-2 border-b border-gray-100"
+                            >
+                              <span className="text-sm">{flavor.name}</span>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleFlavorChange(flavor.name, -1)
+                                  }
+                                  disabled={flavorCount === 0}
+                                  className="w-8 h-8 rounded-full bg-gray-100 text-gray-800 flex items-center justify-center disabled:opacity-50"
+                                >
+                                  -
+                                </button>
+                                <span className="w-8 text-center">
+                                  {flavorCount}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleFlavorChange(flavor.name, 1)
+                                  }
+                                  disabled={
+                                    (!selectedQuantity &&
+                                      selectedQuantity !== -1) ||
+                                    getTotalFlavorCount() >=
+                                      (selectedQuantity === -1
+                                        ? customQuantity
+                                        : selectedQuantity)
+                                  }
+                                  className="w-8 h-8 rounded-full bg-gray-100 text-gray-800 flex items-center justify-center disabled:opacity-50"
+                                >
+                                  +
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </>
               )}
 
@@ -573,7 +588,6 @@ const OrderForm = () => {
             type="button"
             onClick={handleAddItem}
             className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 disabled:opacity-50"
-            disabled={isAddToOrderDisabled()}
           >
             Add to Order
           </button>
