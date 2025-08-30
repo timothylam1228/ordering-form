@@ -42,6 +42,7 @@ const menuItems: MenuItems[] = [
       { name: "Black Sesame", price: 16 },
       { name: "Pistachio", price: 16 },
       { name: "Crème Brûlée", price: 16 },
+      { name: "Match RedBean", price: 16 }
     ],
   },
   {
@@ -295,6 +296,7 @@ const OrderForm = () => {
       if (basePrice === 10) return 6;
       if (basePrice === 12) return 7;
       if (basePrice === 14) return 8;
+      if (basePrice === 16) return 9
       return basePrice / 2; // fallback for other cases
     }
     return basePrice;
