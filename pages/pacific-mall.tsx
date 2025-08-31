@@ -42,7 +42,7 @@ const menuItems: MenuItems[] = [
       { name: "Black Sesame", price: 16 },
       { name: "Pistachio", price: 16 },
       { name: "Crème Brûlée", price: 16 },
-      { name: "Match RedBean", price: 16 }
+      { name: "Matcha RedBean", price: 16 }
     ],
   },
   {
@@ -53,6 +53,8 @@ const menuItems: MenuItems[] = [
       { name: "Chocolate", price: 8 },
       { name: "Pistachio", price: 9 },
       { name: "Crème Brûlée", price: 9 },
+      { name: "Matcha", price: 9 },
+      { name: "Matcha RedBean", price: 9 },
     ],
   },
   {
