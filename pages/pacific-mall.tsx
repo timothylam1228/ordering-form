@@ -51,10 +51,10 @@ const menuItems: MenuItems[] = [
     flavor: [
       { name: "Original", price: 8 },
       { name: "Chocolate", price: 8 },
-      { name: "Pistachio", price: 9 },
-      { name: "Crème Brûlée", price: 9 },
-      { name: "Matcha", price: 9 },
-      { name: "Matcha RedBean", price: 9 },
+      { name: "Pistachio", price: 8 },
+      { name: "Crème Brûlée", price: 8 },
+      { name: "Matcha", price: 8 },
+      { name: "Matcha RedBean", price: 8 },
     ],
   },
   {
